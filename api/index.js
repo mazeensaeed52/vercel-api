@@ -1,18 +1,8 @@
-const crypto = require('crypto');
-
-function reqId() {
-  return crypto.randomBytes(3).toString('hex');
-}
-
 module.exports = (req, res) => {
-  const { target } = req.query;
+  console.log('[API HIT]', new Date().toISOString());
 
-  if (!target) {
-    return res.status(400).send('Missing target');
-  }
-
-  // Send redirect AND end response
+  // Redirect back to our own server
   res.statusCode = 302;
-  res.setHeader('Location', target);
+  res.setHeader('Location', 'https://vercel-api-nzkk.vercel.app/second');
   res.end();
 };
