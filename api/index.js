@@ -4,23 +4,13 @@ const crypto = require('crypto');
 const app = express();
 app.use(express.json());
 
-/*
- Generate short request IDs so logs are readable
-*/
 function reqId() {
   return crypto.randomBytes(3).toString('hex');
 }
 
-/*
- MAIN SSRF ENDPOINT
- ------------------
- The REAL server POSTs here.
- You control the redirect target via query param.
-*/
 app.post('/api', (req, res) => {
   const id = reqId();
   const target = req.query.target;
-
   const start = Date.now();
 
   console.log('\n==============================');
@@ -29,10 +19,15 @@ app.post('/api', (req, res) => {
   console.log('[FROM IP]', req.ip);
   console.log('[REDIRECT TARGET]', target);
 
-  // Immediately redirect the REAL server
-  res.redirect(302, target);
+  if (!target) {
+    return res.status(400).send('Missing target');
+  }
 
-  // When the REAL server finishes its internal fetch
+  // IMPORTANT: explicitly end response
+  res.status(302)
+     .set('Location', target)
+     .end();
+
   res.on('finish', () => {
     const duration = Date.now() - start;
 
@@ -40,22 +35,17 @@ app.post('/api', (req, res) => {
     console.log('[DURATION]', duration, 'ms');
 
     if (duration > 8000) {
-      console.log('[RESULT] 🔥 Blind SSRF very likely (timeout behavior)');
+      console.log('[RESULT] 🔥 Blind SSRF very likely');
     } else if (duration > 1500) {
-      console.log('[RESULT] ⚠️ Possible internal port filtering');
+      console.log('[RESULT] ⚠️ Possible internal filtering');
     } else {
-      console.log('[RESULT] ✅ Internal service reachable / open port');
+      console.log('[RESULT] ✅ Port open');
     }
   });
 });
 
-/*
- Health check
-*/
 app.get('/', (_, res) => {
   res.send('SSRF test server running');
 });
 
-app.listen(8080, () => {
-  console.log('Blind SSRF test server listening on port 8080');
-});
+module.exports = app;
