@@ -13,39 +13,26 @@ app.post('/api', (req, res) => {
   const target = req.query.target;
   const start = Date.now();
 
-  console.log('\n==============================');
-  console.log('[ID]', id);
-  console.log('[TIME]', new Date().toISOString());
-  console.log('[FROM IP]', req.ip);
-  console.log('[REDIRECT TARGET]', target);
-
+  // 1. Validation first
   if (!target) {
     return res.status(400).send('Missing target');
   }
 
-  // IMPORTANT: explicitly end response
-  res.status(302)
-     .set('Location', target)
-     .end();
+  // 2. Logging BEFORE ending the response
+  console.log(`[ID] ${id} | [TARGET] ${target} | [FROM] ${req.ip}`);
 
-  res.on('finish', () => {
-    const duration = Date.now() - start;
+  // 3. SSRF Result Calculation (Synchronous)
+  const duration = Date.now() - start;
+  let result = "✅ Port open";
+  if (duration > 8000) result = "🔥 Blind SSRF very likely";
+  else if (duration > 1500) result = "⚠️ Possible internal filtering";
+  
+  console.log(`[RESULT] ${id}: ${result} (${duration}ms)`);
 
-    console.log('[FINISHED]', id);
-    console.log('[DURATION]', duration, 'ms');
-
-    if (duration > 8000) {
-      console.log('[RESULT] 🔥 Blind SSRF very likely');
-    } else if (duration > 1500) {
-      console.log('[RESULT] ⚠️ Possible internal filtering');
-    } else {
-      console.log('[RESULT] ✅ Port open');
-    }
-  });
-});
-
-app.get('/', (_, res) => {
-  res.send('SSRF test server running');
+  // 4. Send response and STOP
+  // Use 302 for redirection
+  res.setHeader('Location', target);
+  return res.status(302).end();
 });
 
 module.exports = app;
