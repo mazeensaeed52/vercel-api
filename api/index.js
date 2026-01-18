@@ -5,16 +5,14 @@ function reqId() {
 }
 
 module.exports = (req, res) => {
-  const id = reqId();
-  const start = Date.now();
-
-  // Vercel already parses query params
   const { target } = req.query;
 
-  // 1. Validation
   if (!target) {
     return res.status(400).send('Missing target');
   }
 
+  // Send redirect AND end response
+  res.statusCode = 302;
   res.setHeader('Location', target);
+  res.end();
 };
