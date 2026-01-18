@@ -8,7 +8,7 @@ function reqId() {
   return crypto.randomBytes(3).toString('hex');
 }
 
-app.post('/api', (req, res) => {
+app.get('/api', (req, res) => {
   const id = reqId();
   const target = req.query.target;
   const start = Date.now();
