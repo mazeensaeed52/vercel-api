@@ -2,7 +2,7 @@ module.exports = (req, res) => {
   console.log('[API HIT]', new Date().toISOString());
 
   // 2 MB = 2 * 1024 * 1024 bytes
-  const sizeInBytes = 2 * 1024 * 1024;
+  const sizeInBytes = 1 * 1024 * 1024;
 
   // Create a string of 'A' characters
   const responseBody = 'A'.repeat(sizeInBytes);
