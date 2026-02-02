@@ -1,14 +1,14 @@
 module.exports = (req, res) => {
   const entries = [];
 
-  for (let i = 0; i < 15000; i++) {
+  for (let i = 0; i < 25000; i++) {
     entries.push({
       id: i,
       name: "webhook_event_" + i,
       payload: {
-        a: "A".repeat(1000),
-        b: "B".repeat(1000),
-        c: "C".repeat(1000)
+        a: "A".repeat(2000),
+        b: "B".repeat(2000),
+        c: "C".repeat(2000)
       }
     });
   }
