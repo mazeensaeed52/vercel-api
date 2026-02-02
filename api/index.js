@@ -1,14 +1,23 @@
 module.exports = (req, res) => {
-  console.log('[API HIT]', new Date().toISOString());
+  const entries = [];
 
-  // 2 MB = 2 * 1024 * 1024 bytes
-  const sizeInBytes = 1 * 1024 * 1024;
+  for (let i = 0; i < 15000; i++) {
+    entries.push({
+      id: i,
+      name: "webhook_event_" + i,
+      payload: {
+        a: "A".repeat(1000),
+        b: "B".repeat(1000),
+        c: "C".repeat(1000)
+      }
+    });
+  }
 
-  // Create a string of 'A' characters
-  const responseBody = 'A'.repeat(sizeInBytes);
+  const response = {
+    status: "ok",
+    timestamp: Date.now(),
+    data: entries
+  };
 
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.setHeader('Content-Length', Buffer.byteLength(responseBody));
-  res.end(responseBody);
+  res.status(200).json(response);
 };
