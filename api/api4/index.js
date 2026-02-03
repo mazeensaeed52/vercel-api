@@ -1,7 +1,7 @@
 module.exports = (req, res) => {
   const entries = [];
 
-  for (let i = 0; i < 20000; i++) {
+  for (let i = 0; i < 10000; i++) {
     entries.push({
       id: i,
       name: "webhook_event_" + i,
